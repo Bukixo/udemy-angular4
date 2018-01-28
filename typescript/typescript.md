@@ -34,7 +34,7 @@ doSomething();
 
 Using the **let** keyword means that the variable is scoped to the nearest block instead.
 That way we can catch any errors before compile time.
-Typescipt compiles code into es5 code which is supportted by all other browers thats why in the js we would see var rather than let
+Typescipt compiles code into es5 code which is supported by other browsers, that's why in the js we would see var rather than let
 
 ~~~ typescript
 function doSomethingElse() {
@@ -144,7 +144,7 @@ let secondDoLog = (message) => console.log(message);
 let thirdDoLog = () => console.log();
 ~~~
 
-#### Interfaces and Custom Types
+### Interfaces and Custom Types
 
 When working with more complex functions with several paramenters, it is likely that all these paramaters belong to a single concept. For example a car may have several properties and we wouldn't want to pass each property to a function.
 
@@ -200,7 +200,7 @@ lastDrawPoint ({
 })
 ~~~
 
-#### Classes
+### Classes
 
 Things that are related should be part of one unit. Interfaces are purely used for declarations therefore we cannot move our implemations within the functions.
 So instead we add a function declaration i.e draw: () => void
@@ -222,21 +222,22 @@ class NewPoint { //to apply to cohesion rule we changed this to class
 > Unlike Interfaces we can add implementations into classes which we refer to as methods and fields
 The fields and methods are members of a this specific class.
 
-/////===== creatiing objects - instances of the class =====////
+### Creating objects - instances of the class
+Working with objects that use custom types we need to allocate memory to it and this is done by defining a new object
 
-// working with objects that are using custom types we need to allocate memory to it and this is done by defining a new object
+~~~
 let newpoint = new NewPoint();
 newpoint.x = 1;
 newpoint.y = 2;
 newpoint.draw();
+~~~
 
-////////////============ Constructors =============//////////////////////////
+### Constructors
 
-//Now looking at the object above that we've initalised, we can see that it is quite verbose as we have quite
-//a few lines to create the object in a valid state, and i would be worse if we had more lines
-//Constructors help us refactors this
-//It is a methos that is called when we create an instance of that class
+Now looking at the object above that we've initalised, we can see that it is quite verbose as we have a few lines to create the object in a valid state.
+Constructors help us with the refactoring. It is a method that is called when we create an instance of that class
 
+~~~
 class SecondPoint {
   x: number;
   y: number;
@@ -245,30 +246,32 @@ class SecondPoint {
     this.x = x;
     this.y = y
   }
-  //If we want to create an object without setting values or if we are unsure on the values, we can't set more than one constructor.
-  //so solution is to make paramteters optional with '?'.
-  //if you make a parameter optional, all the parameters on the right should be optional too
+~~~
 
+If we want to create an object without setting values or if we are unsure of the values, we can't set more than one constructor. So a solution is to make paramteters optional with '?'.
+If you make a parameter optional, all the parameters on the right should be optional too
+
+~~~
+...
   draw() {
     console.log('X: '+ this.x + 'Y: '+ this.y);
   }
 }
 
-let secondpoint = new SecondPoint(1, 2); //when creating new objects we need to supply the values that we have created in the constructors
+let secondpoint = new SecondPoint(1, 2); 
 secondpoint.draw();
+~~~
 
-//that way we can simplyfy the code and remove the extra line
+when creating new objects we need to supply the values that we have created in the constructors that way we can simplyfy the code and remove the extra lines.
 
 
-/////=============ACCESS MODIFIERS ===============////////////
+### ACCESS MODIFIERS 
 
-//Access Modifiers give us the ability whereby if we initialize an object we shouldn't be able to change the vaue of it's corodintes
-//This makes programmes more predictable and more likely to prevent bugs
-//Using typescript's Access modifiers, which are 'Public', 'Private', and 'Protected' provides a solution to this issue.
-//Public and Private are the most common and by default all memebrs are public.
-// So as it's public and we are able to access all the memenbers (2 fields which are x and y and one method - draw method, or properties) on the intelliSense
-//by prefixing a field or method with the 'private' keyword we restrict the access of the member
+When we initialize an object we shouldn't be able to change the value of it's coordinates. This makes programmes more predictable and more likely to prevent bugs. Using typescript's Access modifiers, which are 'Public', 'Private', and 'Protected' provides a solution to this issue. 'Public' and 'Private' are the most commonly used and by default all members of a class are 'Public'.
+So as it's public and we are able to access all the members on the intelliSense.
+By prefixing a field or method with the 'Private' keyword we restrict the access of the member
 
+~~~
 class ThirdPoint {
   private x: number;
   y: number;
@@ -286,12 +289,13 @@ class ThirdPoint {
 let thirdpoint = new ThirdPoint(1, 2);
 thirdpoint.x = 3 //compilation error - unable to change the corodinate.
 thirdpoint.draw();
+~~~
 
-//Overall, Access Modifiers warrants us to control to certain members of a class form the outside
+Overall, Access Modifiers warrants us to control to certain members of a class form the outside.
 
 
-///==================== Access Modifiers in Constructors parameters ================== /////////////
-
+### Access Modifiers in Constructors parameters
+~~~
 class FourthPoint {
   // x: number;
   // y: number; We can delete these two fields here and prefix the parameters with access modifiers inside the constructor
@@ -311,17 +315,17 @@ class FourthPoint {
 
 let fourthpoint = new FourthPoint(1, 2);
 fourthpoint.draw();
+~~~
+### Properties 
 
-///////================== Porperties ===================/////////////
+Properties what are they used for? If you have private fields and you want to have a read only access to the outside a solution to this is using property 'get' - getter.
+Or if you want to give the consumer of the classes the ability to set values but with one basic validation.
+In that case property 'set' - setter would be used.
+Properties can be read as fields therefore we use camel case notation.
+To avoid clash with existing fields we use the convention of prefixing underlying fields with an underline.
+Properties look like fields form the outside but internally it's really a method within a class.
 
-// Porperties what are they used for? If you have private fields and you want to have a read only access to the outside
-////A solution to this is using property 'get' - getter
-//or if you want to give the consumer of thr classes the ability to set values but with ome basic validation.
-//In that case property 'set' - setter would be used
-//Porperties can be read a fields therefore we use camel case notation.
-//To avoid clash with existing fields we use the convention of prefixing underlying fields with an underline
-//Porperties look like fields form the outside but internally it's really a method within a class.
-
+~~~
 class Fifthpoint {
 
   constructor( private _x: number, private _y: number){
@@ -348,13 +352,14 @@ let x = fifthpoint.x //here we get the x value and display it to the user
 // fifthpoint.setX(10); cleaner syntax below
 fifthpoint.x = 10;
 fifthpoint.draw();
+~~~
 
+### MODULES 
 
-///===================================== MODULES =========================//////
-
-//we add the name of the types that we want to import and if we want to add more we seperate the types through commas
-
+We add the name of the types that we want to import and if we want to add more we seperate the types through commas
+~~~
 import  { Sixthpoint } from './sixthPoint' ;//name of the module is the path
 
 let sixthpoint = new Sixthpoint(1, 2);
 sixthpoint.draw();
+~~~
