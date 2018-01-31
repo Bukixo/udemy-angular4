@@ -1,22 +1,26 @@
+import { NewAuthorsComponent } from './new-author.component';
+
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
 
 
 import { AppComponent } from './app.component';
-import { AuthorsComponent } from './authors/authors.component';
-import { NewAuthorsComponent } from './new-author.component';
+import { AuthorsServices } from './authors.services';
+
+
 
 
 @NgModule({
   declarations: [
     AppComponent,
-    AuthorsComponent,
     NewAuthorsComponent
   ],
   imports: [
     BrowserModule
   ],
-  providers: [],
+  providers: [
+    AuthorsServices
+  ],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

@@ -150,6 +150,7 @@ export class CoursesServices {
 
 With this implentation we can reuse this code across our application.
 So back to the courses.component.ts, we won't have any logic to carry out http services and that allows us to carry out unit testing without having to depending on on the http service.
+
 ~~~
 export class CoursesComponent {
 	title = "List of courses";
@@ -160,7 +161,7 @@ export class CoursesComponent {
 
 #### Dependency injection
 
-There are several ways in how we use the serve within the components
+There are several ways in how we use the service within the components
 
 ~~~
 export class CoursesComponent {
@@ -169,7 +170,7 @@ export class CoursesComponent {
 	
 	constructor() {
 		let service = new CoursesService(); 
-		this.courses = serivce.ghetCourses();
+		this.courses = serivce.getCourses();
 	}
 }
 ~~~
@@ -190,7 +191,7 @@ export class CoursesComponent {
 	
 	constructor(service: CoursesService) {
 	
-		this.courses = serivce.ghetCourses();
+		this.courses = service.getCourses();
 	}
 }
 ~~~
@@ -217,6 +218,29 @@ So inside app.module the provider contains all the depencies that componenets in
 export class AppModule { }
 ~~~
 
+This is what the courses.component should look like
+
+~~~
+import { Component } from '@angular/core';
+import { CoursesServices } from './courses.services';
+
+@Component({
+  selector: 'courses',
+  template: ` {{ title }}
+  <ul>  
+    <li *ngFor="let course of courses"> {{ course }} </li> 
+  </ul>`,
+})
+
+export class NewAuthorsComponent {
+    title = "List of courses";
+    courses;
+    constructor(service: CoursesServices ){
+        this.courses = service.getCourses();
+    } 
+}
+
+~~~
 
 ####Using CLI to create a Service
 
