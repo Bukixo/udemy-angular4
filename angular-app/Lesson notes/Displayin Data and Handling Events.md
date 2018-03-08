@@ -73,13 +73,13 @@ So for the exceptions that don't have a DOM representation we prefix the <strong
 To install bootstrap 
 
 ~~~
-npm install boostrap --save
+npm install bootstrap --save
 ~~~
 
-To import boostrap on the style.css
+To import bootstrap on the style.css
 
 ~~~
-@import "~boostrap/dist/css/boostrap.css"
+@import "~bootstrap/dist/css/bootstrap.css"
 ~~~
 
 ### Class Binding
@@ -238,7 +238,7 @@ import { Component } from '@angular/core';
 ### Two - way Binding
 With property binding the direction of binding goes from component to the view so if changes in the component takes place, it will be automatically changed in the view.
 
-To create a binding that works in two ways - form component to the view and from the view to the component. The directive used for this is ngModel which is used to implement two way binding.
+To create a binding that works in two ways - from component to the view and from the view to the component, The directive used for this is ngModel which is used to implement two way binding.
 
 ~~~ 
 
@@ -283,7 +283,7 @@ import { AuthorsServices } from './authors.services';
     NewAuthorsComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
     FormsModule
   ],
   providers: [

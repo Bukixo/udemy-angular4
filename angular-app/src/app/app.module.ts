@@ -2,10 +2,11 @@ import { NewAuthorsComponent } from './new-author.component';
 
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
-
+import { FormsModule } from '@angular/forms';
 
 import { AppComponent } from './app.component';
 import { AuthorsServices } from './authors.services';
+import { TitleCasesComponent } from './title-cases/title-cases.component';
 
 
 
@@ -13,10 +14,12 @@ import { AuthorsServices } from './authors.services';
 @NgModule({
   declarations: [
     AppComponent,
-    NewAuthorsComponent
+    NewAuthorsComponent,
+    TitleCasesComponent
   ],
   imports: [
-    BrowserModule
+    BrowserModule,
+    FormsModule
   ],
   providers: [
     AuthorsServices
