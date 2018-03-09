@@ -14,7 +14,7 @@ Most markdown syntaxes work inside block quotes.
 
 
 
-### Delcaring Variables
+### Declaring Variables
 
 There are two ways of declaring variables **var** or **let**.
 When using **var** to declare variables, they become scoped to the nearest function which in this case is available anywhere in the doSomething function.
