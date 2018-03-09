@@ -1,5 +1,7 @@
 ## Directives
 
+## Directives
+
 There are two types of directives 
 - Structural Directives modify the structure of the DOM
 - Attribute Directives modify the attributes of the DOM elements
