@@ -2,7 +2,7 @@
 
 ## Directives
 
-There are two types of directives 
+There are two types of directives
 - Structural Directives modify the structure of the DOM
 - Attribute Directives modify the attributes of the DOM elements
 
@@ -22,7 +22,7 @@ ng-if directives enables us to show or hide attributes in our page.
 
 ### hidden attribute
 
-Another way to show and hide attributes would be by using the 'hide' property like so 
+Another way to show and hide attributes would be by using the 'hide' property like so
 
 ~~~
 <div [hidden]="courses.length == 0>
@@ -47,9 +47,9 @@ We firstly start with a basic mark up using zen coding inside our app.component.
 ul.nav.nav-pills
 
 <ul class="nav nav-pills"></ul>
- 
+
  //////
- 
+
 <ul class="nav nav-pills">
   (li>a)*2
 </ul>
@@ -99,3 +99,155 @@ Back on the app.component.html we render the fields dynamically based on teh val
 ~~~
 
 ####ngFor
+
+Used to render a list of objects.
+
+So in the app.component.ts we are going to define an array of objects.
+
+~~~
+////
+export class AppComponent {
+	courses = [
+		{ id: 1, name: 'course1'},
+		{ id: 2, name: 'course2'},
+		{ id: 3, name: 'course3'}
+	]
+}
+~~~
+
+Now er use the ngFor directive to render in the view.
+
+~~~
+<ul>
+	<li *ngFor="let course of courses">
+		{{ course.name }}
+	</li>
+</ul>
+
+~~~
+
+If you would like to display an exported value such as index we get the value of index and se it as a local variable called i then use interpolation to print it out.
+
+~~~
+<ul>
+	<li *ngFor="let course of courses; index as i">
+		{{ i }} - {{ course.name }}
+	</li>
+</ul>
+~~~
+
+If you want to render all the even values, we access the value then alias it as a local variable.
+
+~~~
+<ul>
+	<li *ngFor="let course of courses; even as isEven">
+		{{ course.name }} <span> Even </span>
+	</li>
+</ul>
+~~~
+
+To find a list of all exported values check out this website - https://angular.io/api/common/NgForOfContext
+
+###ngFor and change Detection
+
+Angular is a change detection mechanism, so whenevr we click a button, recieve an ajax request or triggered by a timer, angular perfoms its change dtection.
+
+Use click event to bind to a method to create a new course
+~~~
+<button (click)="onAdd()">Add</button>
+<ul>
+	<li *ngFor="let course of courses">
+		{{ course.name }}
+	</li>
+</ul>
+~~~
+>app.component.html
+
+create the method that pushes a new course into the array.
+~~~
+////
+export class AppComponent {
+	courses = [
+		{ id: 1, name: 'course1'},
+		{ id: 2, name: 'course2'},
+		{ id: 3, name: 'course3'}
+	];
+
+	onAdd() {
+		this.courses.push({ id:4, name: 'course4' })
+	}
+}
+~~~
+>app.component.ts
+
+Similarly we can add a button to remove it.
+~~~
+<button (click)="onAdd()">Add</button>
+<ul>
+	<li *ngFor="let course of courses">
+		{{ course.name }}
+		<button (click)="onRemove(course)">Remove</button>
+	</li>
+</ul>
+~~~
+>app.component.html
+
+~~~
+////
+export class AppComponent {
+	courses = [
+		{ id: 1, name: 'course1'},
+		{ id: 2, name: 'course2'},
+		{ id: 3, name: 'course3'}
+	];
+
+	onAdd() {
+		this.courses.push({ id:4, name: 'course4' })
+	}
+	onRemove(course){
+		let index = this.courses.indexOf(course) //first get index of array
+		this.courses.splice(index, 1); //we go into that index an delete that object.
+	}
+}
+~~~
+>app.component.ts
+
+###ngFor and Trackby
+
+if you are deaing with a large list and complex markup and you notice perfomance speed issues than the trackby feature ay be a solution to this issue would be trackby feature.
+
+Each time when loading angular reconstructs the entire DOM object tree and this can be costly when dealing with large complex lists called from the backend.
+
+
+Angular by default tracks object by their identity. When we are resetting the objects, even though we are dealing witht he exact same content, these objects will be differencet from their previous object in the memory. So angualr sees it as new conetnt so it reconstructs it as new objects.
+
+ngfor lets us change the way we track objects as by default Angular tracks by object id. So instead by tracking by the identity or refernce in the memonry we want to track it by the id of the object.
+
+~~~
+<ul>
+	<li *ngFor="let course of courses; trackBy: trackCourse">
+		{{ course.name }}
+	</li>
+</ul>
+
+~~~
+
+to implementnthis method in our app.component.ts, this should take two parameters, the index and course.
+
+~~~
+////
+export class AppComponent {
+	courses = [
+		{ id: 1, name: 'course1'},
+		{ id: 2, name: 'course2'},
+		{ id: 3, name: 'course3'}
+	];
+
+	trackCourse(index, course) {
+		return course ? course.id : undefined;
+	}
+
+}
+~~~
+
+Here weve chnaged how angualr tracks objects - instead of their identity we track by their id.
