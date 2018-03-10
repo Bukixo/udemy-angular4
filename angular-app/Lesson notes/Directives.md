@@ -251,3 +251,264 @@ export class AppComponent {
 ~~~
 
 Here weve chnaged how angualr tracks objects - instead of their identity we track by their id.
+
+#####The leading asterisk
+
+We are telling angular to rewrite the div into a ng-template.
+From this -
+
+~~~
+<div *ngIf="courses.lenght > 0; else noCourses">
+	List of courses
+</div>
+<ng-template>
+	No courses
+</ng-template>
+~~~
+
+It will create a new ng-template, apply ngif as property binding on to the ng-template and bind it to the expression and for the esle it will apply simlar property binding on the ng-template.
+
+~~~
+<div *ngIf="courses.lenght > 0; else noCourses">
+	List of courses
+</div>
+<ng-template [ngIf]="courses.length > 0">
+	<div>
+		List of courses
+	</div>
+</ng-template>
+
+<ng-template [ngIf]="!(courses.length > 0)">
+	No courses
+</ng-template>
+~~~
+
+We can do this ourselves but it saves time letting angualr do this.
+
+##### ngClass
+
+When dealing with multiple classes, ngClass gives us the ability to refactor and make code much cleaner.
+
+~~~
+<span
+	class="glyphicon"
+	[class.glyphicon-star]="isSelected"
+	[class.glyphicon-star-empty]="!isSelected"
+	(click)="onClick()"
+	></span>
+~~~
+
+This is done by binding ngClass to an expression and create objects that has one or more key value pairs. Each key represents a css class and the value determines if the style is rendred or not.
+
+~~~
+<span
+	class="glyphicon"
+	[ngClass]="{
+		'glyphicon-star': isSelected,
+		'glyphicon-star-empty: '!isSelected
+	}"
+	(click)="onClick()"
+	></span>
+~~~
+
+This directive is an example of arrtibute directive. It is used ot modify an element within the DOM
+
+####ngStyle
+
+Similar to the ngClass directive, the ngStyle directive enables us to clean up noisy code when delaing wtih several style bindings.
+
+~~~
+<button 
+	[style.backgourndColor]="canSave ? 'blue': 'grey'"
+	[style.color]="canSave ? 'white': 'black'"
+	[style.fontWeight]="canSave ? 'bold': 'normal'"
+>
+Save
+</button>
+~~~
+
+Using property binding syntax and bind ngStyle to an expression. We then create an object with key value pairs.
+
+~~~
+<button 
+	[ngStyle]="{
+		'backgourndColor': canSave ? 'blue': 'grey',
+		'style.color': canSave ? 'white': 'black',
+		'style.fontWeight': canSave ? 'bold': 'normal'
+>
+Save
+</button>
+~~~
+
+
+####Safe traversal Operator
+
+When dealing with complex object it is possible that the value of a property may be null or undefined for a period of time. For example when calling objects fromdifferent endpoints from a server. Then for that period of time the property field may be null or undefined, this will potentailly cause an issue in the console 
+
+~~~
+cannot read property "__" of null
+~~~
+
+A solution to this would be using a ngIf to only render the span when its a truthy
+
+~~~
+<span *ngIf="task.assignee">{{ task.assignee.name }}</span>
+~~~
+
+Alternatively if we want to keep the span in the DOM but we don't want to render the property if it's null we can use Safe traversal Operator.
+
+So because the assignee can be null or undefined we put a "?" before it. 
+
+~~~
+<span {{ task.assignee?.name }}</span>
+~~~
+
+If it's null or undefined it will be ignored or else it the name will be returned.
+
+
+###custome directives
+
+To have control over behaviour of the DOM elements we can create custome directives.
+
+To implement directives, we can create it from scratch or we can use angular cli to generate the directive component.
+
+~~~
+ng g d input-format
+~~~
+
+As well as creating files it modifies the app.module file.
+
+Inside the input-format.directive.ts we can see the similarities it shares with a normal component.
+We import the declarator function <strong>HostListener</strong> which let's us subscribe to events raised from the DOM elements (the dom element that has this arttribute)
+
+~~~
+import { Directive, HostListener } from '@angular/core';
+
+@Directive({
+	selector: '[appInputFormat]'
+})
+
+export class InputFormatDirective {
+	
+	constructor() {
+	
+	}
+
+}
+
+~~~
+
+Firstly we get the value of the inputy field. First we need a refernce of our host element, so inside our constructor we need to inject an element refernce object.
+<strong>ElementRef</strong> is a service in angualr that gives us access to a DOM object.
+
+~~~
+import { Directive, HostListener, ElementRef } from '@angular/core';
+
+@Directive({
+	selector: '[appInputFormat]'
+})
+
+export class InputFormatDirective {
+	constructor(private el: ElementRef) { }
+	@HostListener('blur') onBlur(){
+		
+	}
+	
+
+}
+
+~~~
+
+Now on the onBlur() method, we need to read the value of the input field first and access the native element property - giving us access to the actual DOM object. Using type annottation we can access all the methd defined in the string class
+
+
+~~~
+import { Directive, HostListener, ElementRef } from '@angular/core';
+
+@Directive({
+	selector: '[appInputFormat]'
+})
+
+export class InputFormatDirective {
+	constructor(private el: ElementRef) { }
+	@HostListener('blur') onBlur(){
+	
+		let value: string = this.el.nativeElement.value;
+		this.el.nativeElement.value = value.toLowercase();
+		
+	}
+	
+
+}
+~~~
+
+Back on the app.component.html
+
+~~~
+<input type="text" appInputFormat>
+~~~
+
+If we wanted to add more flexiblity and customisation in the input field, we can define a field and mark it as a input property. 
+
+~~~
+<input type="text" appInputFormat [format] = "'uppercase'">
+~~~
+
+Inside the input-format.directive.ts we define the new field and delcart it with a <strong> @input()</strong> then import it form our angualr/core.
+
+
+~~~
+import { Directive, HostListener, ElementRef, Input } from '@angular/core';
+
+@Directive({
+	selector: '[appInputFormat]'
+})
+
+export class InputFormatDirective {
+	@Input('format') format;
+	
+	constructor(private el: ElementRef) { }
+	
+	@HostListener('blur') onBlur(){
+	
+		let value: string = this.el.nativeElement.value;
+		
+		if (this.format == 'lowercase')
+			this.el.nativeElement.value = value.toLowercase();
+		else
+			this.el.nativeElement.value = value.toUppercase();
+		
+	}	
+
+}
+~~~
+
+We have to apply this 'appInputFormat' directive as an attribute and then use property binding to set the target 'format'.
+Since we only have one input property, it would be cleaner to set the target format whilet applying the directive as an attribute 
+
+~~~
+<input type="text" [appInputFormat]="'uppercase'">
+~~~
+
+to implment this we change the format to the sleecetor of our directives in out directives.
+
+~~~
+//////
+
+export class InputFormatDirective {
+	@Input('appInputFormat') format;
+	
+	constructor(private el: ElementRef) { }
+	
+	@HostListener('blur') onBlur(){
+	
+	//////
+	
+
+~~~
+
+
+
+
+
+
