@@ -1,13 +1,11 @@
-## Directives
-
-## Directives
+# Directives
 
 There are two types of directives
 - Structural Directives modify the structure of the DOM
 - Attribute Directives modify the attributes of the DOM elements
 
-###ng-if
-ng-if directives enables us to show or hide attributes in our page.
+## ng-if
+The ng-if directive enables us to show or hide attributes in our page.
 
 ~~~
 <div *ngIf="courses.length > 0; then coursesList else noCourses></div>
@@ -20,7 +18,7 @@ ng-if directives enables us to show or hide attributes in our page.
 ~~~
 >app.component.html  
 
-### hidden attribute
+## Hidden attributes
 
 Another way to show and hide attributes would be by using the 'hide' property like so
 
@@ -33,13 +31,13 @@ Another way to show and hide attributes would be by using the 'hide' property li
 </div>
 ~~~
 
-The main difference between between <strong>NgIf</strong> and <strong>hidden</strong> is that the the ngIf elements are removed from the DOM whereas with the hidden sttributes, elements are only hidden.
+The main difference between between <strong>NgIf</strong> and <strong>Hidden</strong> is that the ngIf elements are removed from the DOM whereas with the hidden attributes, elements are only hidden.
 
-When working on a complex projects whereby the tree has large amounts of child dom elements there is a potential risk of taking up too much memmory and therefore it would be advised to use ngIf as attributes would be completely removed form the DOM and free up resources. This also can increase performance. So dealing with a small tree with objects, hidden is prefered.
+When working on complex projects whereby the tree has large amounts of child DOM elements there is a potential risk of taking up too much memory and therefore it would be advised to use ngIf as attributes would be completely removed form the DOM and free up resources. This also can increase performance. So dealing with a small tree with objects, hidden is preferred.
 
-### ngSwitch Case
+## ngSwitch Case
 
-ngSwitch Case helps us to switch across properties. The difference between ngswitch case and ngIf is that although you can switch across properties with ngIf, it only works with booleans. Therefore it wuldn work with multiple tabs.
+ngSwitch Case helps us to switch across properties. The difference between ngswitch case and ngIf is that although you can switch across properties with ngIf, it only works with booleans. Therefore it ould fail with multiple tabs.
 
 We firstly start with a basic mark up using zen coding inside our app.component.html.
 
@@ -84,7 +82,7 @@ export class AppComponent {
 
 >The viewMode can hold any of the values - map or list
 
-Back on the app.component.html we render the fields dynamically based on teh value of the viewMode field. So we add new property binding - ngSwitch and use to bind to a field of our class. We also add the click event to change the viewmode
+Back on the app.component.html we render the fields dynamically based on the value of the viewMode field. So we add new property binding - ngSwitch and use it to bind to a field of our class. We also add the click event to change the viewMode.
 
 ~~~
 <ul class="nav nav-pills">
@@ -98,7 +96,7 @@ Back on the app.component.html we render the fields dynamically based on teh val
 </div>
 ~~~
 
-####ngFor
+## ngFor
 
 Used to render a list of objects.
 
@@ -115,7 +113,7 @@ export class AppComponent {
 }
 ~~~
 
-Now er use the ngFor directive to render in the view.
+Then apply the ngFor directive to render the list in the view.
 
 ~~~
 <ul>
@@ -126,7 +124,7 @@ Now er use the ngFor directive to render in the view.
 
 ~~~
 
-If you would like to display an exported value such as index we get the value of index and se it as a local variable called i then use interpolation to print it out.
+To display an exported value such as index we get the value of index and set it as a local variable called 'i' then use interpolation to print it out.
 
 ~~~
 <ul>
@@ -148,11 +146,12 @@ If you want to render all the even values, we access the value then alias it as 
 
 To find a list of all exported values check out this website - https://angular.io/api/common/NgForOfContext
 
-###ngFor and change Detection
+## ngFor and change Detection
 
-Angular is a change detection mechanism, so whenevr we click a button, recieve an ajax request or triggered by a timer, angular perfoms its change dtection.
+Angular has a change detection mechanism, so when we click a button, recieve an ajax request or triggered by a timer, Angular performs it's change detection.
 
-Use click event to bind to a method to create a new course
+to demo this we use a click event to bind to a method to create a new course
+
 ~~~
 <button (click)="onAdd()">Add</button>
 <ul>
@@ -163,7 +162,8 @@ Use click event to bind to a method to create a new course
 ~~~
 >app.component.html
 
-create the method that pushes a new course into the array.
+Then create the method that pushes a new course into the array.
+
 ~~~
 ////
 export class AppComponent {
@@ -181,6 +181,7 @@ export class AppComponent {
 >app.component.ts
 
 Similarly we can add a button to remove it.
+
 ~~~
 <button (click)="onAdd()">Add</button>
 <ul>
@@ -212,16 +213,16 @@ export class AppComponent {
 ~~~
 >app.component.ts
 
-###ngFor and Trackby
+## ngFor and Trackby
 
-if you are deaing with a large list and complex markup and you notice perfomance speed issues than the trackby feature ay be a solution to this issue would be trackby feature.
+Dealing with a large list and complex markup can cause perfomance speed issues. A solution is the trackby feature.
 
-Each time when loading angular reconstructs the entire DOM object tree and this can be costly when dealing with large complex lists called from the backend.
+Each time when loading, Angular reconstructs the entire DOM object tree and this can be costly when dealing with large complex lists called from the backend.
 
 
-Angular by default tracks object by their identity. When we are resetting the objects, even though we are dealing witht he exact same content, these objects will be differencet from their previous object in the memory. So angualr sees it as new conetnt so it reconstructs it as new objects.
+Angular by default tracks object by their identity. When we are resetting the objects, even though we are dealing with the exact same content, these objects will be different from their previous object in the memory. So Angular sees it as new content so it reconstructs it as new objects.
 
-ngfor lets us change the way we track objects as by default Angular tracks by object id. So instead by tracking by the identity or refernce in the memonry we want to track it by the id of the object.
+ngfor lets us change the way we track objects as by default Angular tracks by object id. So instead by tracking by the identity or reference in the memonry we want to track it by the id of the object.
 
 ~~~
 <ul>
@@ -232,7 +233,7 @@ ngfor lets us change the way we track objects as by default Angular tracks by ob
 
 ~~~
 
-to implementnthis method in our app.component.ts, this should take two parameters, the index and course.
+To implementn this method in our app.component.ts, it should take two parameters, the index and course.
 
 ~~~
 ////
@@ -250,11 +251,12 @@ export class AppComponent {
 }
 ~~~
 
-Here weve chnaged how angualr tracks objects - instead of their identity we track by their id.
+Here we've changed how Angular tracks objects - instead of their identity we track by their id.
 
-#####The leading asterisk
+### The leading asterisk
 
-We are telling angular to rewrite the div into a ng-template.
+We are telling Angular to rewrite the div into a ng-template.
+
 From this -
 
 ~~~
@@ -269,7 +271,7 @@ From this -
 It will create a new ng-template, apply ngif as property binding on to the ng-template and bind it to the expression and for the esle it will apply simlar property binding on the ng-template.
 
 ~~~
-<div *ngIf="courses.lenght > 0; else noCourses">
+<div *ngIf="courses.length > 0; else noCourses">
 	List of courses
 </div>
 <ng-template [ngIf]="courses.length > 0">
@@ -283,9 +285,9 @@ It will create a new ng-template, apply ngif as property binding on to the ng-te
 </ng-template>
 ~~~
 
-We can do this ourselves but it saves time letting angualr do this.
+We can do this ourselves but it saves time.
 
-##### ngClass
+### ngClass
 
 When dealing with multiple classes, ngClass gives us the ability to refactor and make code much cleaner.
 
@@ -311,15 +313,15 @@ This is done by binding ngClass to an expression and create objects that has one
 	></span>
 ~~~
 
-This directive is an example of arrtibute directive. It is used ot modify an element within the DOM
+This directive is an example of arrtibute directive. It is used to modify an element within the DOM.
 
-####ngStyle
+### ngStyle
 
-Similar to the ngClass directive, the ngStyle directive enables us to clean up noisy code when delaing wtih several style bindings.
+Similar to the ngClass directive, ngStyle directive enables us to clean up noisy code when dealing with multiple style bindings.
 
 ~~~
-<button 
-	[style.backgourndColor]="canSave ? 'blue': 'grey'"
+<button
+	[style.backgroundColor]="canSave ? 'blue': 'grey'"
 	[style.color]="canSave ? 'white': 'black'"
 	[style.fontWeight]="canSave ? 'bold': 'normal'"
 >
@@ -330,9 +332,9 @@ Save
 Using property binding syntax and bind ngStyle to an expression. We then create an object with key value pairs.
 
 ~~~
-<button 
+<button
 	[ngStyle]="{
-		'backgourndColor': canSave ? 'blue': 'grey',
+		'backgroundColor': canSave ? 'blue': 'grey',
 		'style.color': canSave ? 'white': 'black',
 		'style.fontWeight': canSave ? 'bold': 'normal'
 >
@@ -341,9 +343,9 @@ Save
 ~~~
 
 
-####Safe traversal Operator
+### Safe traversal Operator
 
-When dealing with complex object it is possible that the value of a property may be null or undefined for a period of time. For example when calling objects fromdifferent endpoints from a server. Then for that period of time the property field may be null or undefined, this will potentailly cause an issue in the console 
+When dealing with complex object it is possible that the value of a property may be null or undefined for a period of time. For example when calling objects from different endpoints from a server. Then for that period of time the property field may be null or undefined, this will potentailly cause an issue in the console
 
 ~~~
 cannot read property "__" of null
@@ -357,7 +359,7 @@ A solution to this would be using a ngIf to only render the span when its a trut
 
 Alternatively if we want to keep the span in the DOM but we don't want to render the property if it's null we can use Safe traversal Operator.
 
-So because the assignee can be null or undefined we put a "?" before it. 
+So because the assignee can be null or undefined we put a "?" before it.
 
 ~~~
 <span {{ task.assignee?.name }}</span>
@@ -366,9 +368,9 @@ So because the assignee can be null or undefined we put a "?" before it.
 If it's null or undefined it will be ignored or else it the name will be returned.
 
 
-###custome directives
+### custom directives
 
-To have control over behaviour of the DOM elements we can create custome directives.
+To have control over behaviour of the DOM elements we can create custom directives.
 
 To implement directives, we can create it from scratch or we can use angular cli to generate the directive component.
 
@@ -389,17 +391,17 @@ import { Directive, HostListener } from '@angular/core';
 })
 
 export class InputFormatDirective {
-	
+
 	constructor() {
-	
+
 	}
 
 }
 
 ~~~
 
-Firstly we get the value of the inputy field. First we need a refernce of our host element, so inside our constructor we need to inject an element refernce object.
-<strong>ElementRef</strong> is a service in angualr that gives us access to a DOM object.
+Firstly we get the value of the input field. Then we need a reference of our host element, so inside our constructor we inject an element reference object.
+<strong>ElementRef</strong> is a service in Anuglar that gives us access to a DOM object.
 
 ~~~
 import { Directive, HostListener, ElementRef } from '@angular/core';
@@ -411,15 +413,15 @@ import { Directive, HostListener, ElementRef } from '@angular/core';
 export class InputFormatDirective {
 	constructor(private el: ElementRef) { }
 	@HostListener('blur') onBlur(){
-		
+
 	}
-	
+
 
 }
 
 ~~~
 
-Now on the onBlur() method, we need to read the value of the input field first and access the native element property - giving us access to the actual DOM object. Using type annottation we can access all the methd defined in the string class
+Now on the onBlur() method, we need to read the value of the input field first and access the native element property - giving us access to the actual DOM object. Using type annottation we can access all the method defined in the string class.
 
 
 ~~~
@@ -432,12 +434,12 @@ import { Directive, HostListener, ElementRef } from '@angular/core';
 export class InputFormatDirective {
 	constructor(private el: ElementRef) { }
 	@HostListener('blur') onBlur(){
-	
+
 		let value: string = this.el.nativeElement.value;
 		this.el.nativeElement.value = value.toLowercase();
-		
+
 	}
-	
+
 
 }
 ~~~
@@ -448,13 +450,13 @@ Back on the app.component.html
 <input type="text" appInputFormat>
 ~~~
 
-If we wanted to add more flexiblity and customisation in the input field, we can define a field and mark it as a input property. 
+If we wanted to add more flexiblity and customisation into the input field, we can define a field and mark it as a input property.
 
 ~~~
 <input type="text" appInputFormat [format] = "'uppercase'">
 ~~~
 
-Inside the input-format.directive.ts we define the new field and delcart it with a <strong> @input()</strong> then import it form our angualr/core.
+Inside the input-format.directive.ts we define the new field and delcare it with a <strong> @input()</strong> then import it form our angular/core.
 
 
 ~~~
@@ -466,49 +468,43 @@ import { Directive, HostListener, ElementRef, Input } from '@angular/core';
 
 export class InputFormatDirective {
 	@Input('format') format;
-	
+
 	constructor(private el: ElementRef) { }
-	
+
 	@HostListener('blur') onBlur(){
-	
+
 		let value: string = this.el.nativeElement.value;
-		
+
 		if (this.format == 'lowercase')
 			this.el.nativeElement.value = value.toLowercase();
 		else
 			this.el.nativeElement.value = value.toUppercase();
-		
-	}	
+
+	}
 
 }
 ~~~
 
 We have to apply this 'appInputFormat' directive as an attribute and then use property binding to set the target 'format'.
-Since we only have one input property, it would be cleaner to set the target format whilet applying the directive as an attribute 
+Since we only have one input property, it would be cleaner to set the target format while applying the directive as an attribute.
 
 ~~~
 <input type="text" [appInputFormat]="'uppercase'">
 ~~~
 
-to implment this we change the format to the sleecetor of our directives in out directives.
+To impelment this we change the format to the selector of our directives in our directives.
 
 ~~~
 //////
 
 export class InputFormatDirective {
 	@Input('appInputFormat') format;
-	
+
 	constructor(private el: ElementRef) { }
-	
+
 	@HostListener('blur') onBlur(){
-	
+
 	//////
-	
+
 
 ~~~
-
-
-
-
-
-
