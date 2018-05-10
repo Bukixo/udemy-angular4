@@ -1,3 +1,6 @@
+import { PostService } from './post.service';
+import { HttpModule } from '@angular/http';
+
 import { NewAuthorsComponent } from './new-author.component';
 
 import { BrowserModule } from '@angular/platform-browser';
@@ -7,6 +10,8 @@ import { FormsModule } from '@angular/forms';
 import { AppComponent } from './app.component';
 import { AuthorsServices } from './authors.services';
 import { TitleCasesComponent } from './title-cases/title-cases.component';
+import { PostsComponent } from './posts/posts.component';
+
 
 
 
@@ -15,13 +20,16 @@ import { TitleCasesComponent } from './title-cases/title-cases.component';
   declarations: [
     AppComponent,
     NewAuthorsComponent,
-    TitleCasesComponent
+    TitleCasesComponent,
+    PostsComponent
   ],
   imports: [
     BrowserModule,
-    FormsModule
+    FormsModule,
+    HttpModule
   ],
   providers: [
+    PostService,
     AuthorsServices
   ],
   bootstrap: [AppComponent]

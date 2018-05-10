@@ -1,26 +1,11 @@
-
-> Angle brackets `>` are used for block quotes.  
-Technically not every line needs to start with a `>` as long as
-there are no empty lines between paragraphs.  
-> Looks kinda ugly though.
-> > Block quotes can be nested.  
-> > > Multiple Levels
-
-Most markdown syntaxes work inside block quotes.
->
-> * Lists
-> * [Links][arbitrary_id]
-> * Etc.
-
-
-
 ### Declaring Variables
 
 There are two ways of declaring variables **var** or **let**.
 When using **var** to declare variables, they become scoped to the nearest function which in this case is available anywhere in the doSomething function.
 **const** is an augmentation of let in that it prevents re-assignment to a variable.
 
-~~~ JavaScript
+~~~ 
+JavaScript
 function doSomething() {
   for (var i = 0; i < 5; i++) {
     console.log(i);
@@ -72,7 +57,7 @@ let h: undefined;
 #### User-defined Types
 User-defined types include Enumerations (enums), classes, interfaces, arrays, and tuple.
 
-If we are working for on a group of related constances, this is what it would look like in vanilla javascript
+If we are working on a group of related constances, this is what it would look like in vanilla javascript
 
 ```const ColorRed = 0;
 const ColorGreen = 1;
@@ -98,10 +83,9 @@ When var is defined as a string we are given a range of methods through the inte
 let message = 'abc'
 let upperCase = message.toUpperCase;
 ~~~
->intelliSense option gave you the '.toUpperCase' method.
+>intelliSense option gives you the '.toUpperCase' method.
 
-But sometimes typescript can be confused with the type of the variable
-If we dont set a value, the intelliSense, displaying the methods that are associated with strings, would no longer be in use as we would be working with **any** type.
+But sometimes typescript can be confused with the type of the variable if we dont set a value, the intelliSense, displaying the methods that are associated with strings, would no longer be in use as we would be working with **any** type.
 
 Therefore we need to tell the typescript compiler that we are working with a string. This is done using type assertion.
 
@@ -112,10 +96,10 @@ let anotherUpperCase = (<string>message).toLowerCase; //this approach is used mo
 let alterntaiveUpperCase = (message as string).toLowerCase;
 ~~~
 
-Type assertions do not restructure the type of a variable during run time. It only tells typescipt the type of varbale, that way we can access the intelliSense.
+Type assertions do not restructure the type of a variable during run time. It only tells typescipt the type of varibale, that way we can access the intelliSense.
 
 
-### ARROW FUNCTIONCTIONS
+### ARROW FUNCTIONS	
 
 >JavaScript way
 
@@ -305,7 +289,7 @@ class FourthPoint {
     //tyepscipt compiler will then generate this field for us. therefore we can delete
     // this.x = x;
     // this.y = y
-    // as we would jusyt eb repeating ourselves
+    // as we would just be repeating ourselves
   }
 
   draw() {
