@@ -1,4 +1,4 @@
-import { PostService } from './post.service';
+import { PostService } from './services/post.service';
 import { HttpModule } from '@angular/http';
 
 import { NewAuthorsComponent } from './new-author.component';

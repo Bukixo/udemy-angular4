@@ -11,17 +11,15 @@ export class PostService {
     return this.http.get(this.url);
   }
   //
-  createPosts() {
-    const post: any = { title: input.value };
-    input.value = ' ';
+  createPost(post) {
     return this.http.post(this.url, JSON.stringify(post));
   }
   //
-  updatePosts() {
+  updatePost(post) {
     return this.http.patch(this.url + '/' + post.id, JSON.stringify({isRead: true}));
   }
   //
-  deletePosts() {
+  deletePosts(post) {
     return this.http.delete(this.url + '/' + post.id);
   }
 }
