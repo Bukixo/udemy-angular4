@@ -1,5 +1,8 @@
+import { AppError } from './../common/app-error';
 import { PostService } from './../services/post.service';
 import { Component, OnInit } from '@angular/core';
+import { NotFoundError } from '../common/not-found-error';
+import { BadInput } from '../common/bad-input-error';
 
 
 @Component({
@@ -20,7 +23,7 @@ export class PostsComponent implements OnInit {
         },
         error => {
           alert('An unexpeted error occured!!!!');
-          console.log(error);
+          console.log(error );
         });
     }
 
@@ -33,12 +36,12 @@ export class PostsComponent implements OnInit {
         post['id'] = response.json().id;
         this.posts.splice(0, 0, post);
       },
-      (error: Response) => {
-        if (error.status === 400) {
-          // this.form.setErrors(error.json());
+      (error: AppError) => {
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError;
         } else {
           alert('An unexpeted error occured!!!!');
-        console.log(error);
+        console.log(error + 'something bad happend');
         }
       });
     }
@@ -55,19 +58,18 @@ export class PostsComponent implements OnInit {
       });
   }
   deletePost(post) {
-    this.service.deletePosts(345)
+    this.service.deletePost(234)
       .subscribe(
         response => {
           const index = this.posts.indexOf(post);
           this.posts.splice(index, 1);
         },
-        (error: Response) => {
-          if (error.status === 404 ) {
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
             alert('Post already deleted');
           } else {
             alert('An unexpeted error occured!!!!');
-          console.log(error);
           }
         });
-  }
+    }
 }

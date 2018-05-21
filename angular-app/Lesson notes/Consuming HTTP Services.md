@@ -170,6 +170,16 @@ When using the patch/put it's important to reference a specific post by appendin
 
 ### DELETING DATA
 
+~~~
+deletePost(post) {
+  this.http.delete(this.url + '/' + post.id)
+    .subscribe(response => {
+      let index = this.posts.indexOf(post);
+      this.posts.splice(index, 1);
+    });
+}
+~~~
+
 ####OnInit Interface
 Initially we call the the http requests to access the posts inside the constructor, however as a good practice, constructors should be very lightweight and not perform expensive operations.
 
@@ -524,4 +534,4 @@ createPost(input: HTMLInputElement) {
     }
 ~~~
 
-The line won't compile as don't haveform
+The line won't compile as don't have a form.
