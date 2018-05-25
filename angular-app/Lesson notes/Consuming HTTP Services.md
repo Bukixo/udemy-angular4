@@ -535,3 +535,388 @@ createPost(input: HTMLInputElement) {
 ~~~
 
 The line won't compile as don't have a form.
+
+###Throwing Application specific errors
+
+An Issue that comes with this implmentation is that it violates the seperation of concern. As we are working with the repsonse object which comes from the server it should be moved inside our service.
+
+~~~
+////
+      },
+      (error: Response) => {
+        if (error.status === 400) {
+         
+        /////
+~~~
+
+Firstly we want to make sure that if we are faced with an error, we would want to catch the error and instead of sending our response object to the component, we want to send a different object that is part of our application domain.
+
+To catch the error we add a new parameter to the Observable (Observable is a type part of a third party called reactive extensions). The methods within the Observeables are not automatically available therefore we need to import it first then add the ".catch" to catch the error and send a different kind of object to the consumer of this service wihc our post component.
+
+Then we return an obserable with an error.
+The "Observable.throw()" will rertun a new obseravble that will have an error
+
+~~~
+post.service.ts
+
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+
+
+  deletePost(post) {
+    return this.http.delete(this.url + '/' + post.id)
+      .catch((error: Response) => {
+        if (error.status === 404) {
+          return Observable.throw();
+        
+      });
+  }
+}
+~~~
+
+The type of the error should be something that is specific to our application not repsonse object. So we need to create a new class for application specific errors. Therefore we create a new file './common/app-error.ts' 
+
+We export the class AppError class so we can represent an application error. 
+
+~~~
+app-error.ts 
+
+
+export class AppError {
+    constructor(public originalError?: any) {}
+}
+~~~
+
+Now we can apss our AppError object. We include the original error because somewhere we are going to get that error and log it into our server.
+
+Ctahcing an error object which is an instance of an Response class and then we are returning and different kind of error thats specific to our application.
+
+~~~
+post.service.ts
+
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+
+
+  deletePost(post) {
+    return this.http.delete(this.url + '/' + post.id)
+      .catch((error: Response) => {
+        if (error.status === 404) {
+          return Observable.throw(new NotFoundError());
+        } 
+      });
+  }
+}
+
+~~~
+Now we need to change the implementation so that we can check for the status of our error ie 400 or 404 and return a different kind of error.
+
+To begin we create a new file called not-found-error-.ts and here we export the class NotFoundError. we want the class to derive from the AppError because this is the a specific application error.
+
+~~~
+not-found-error-.ts
+
+
+import { AppError } from './app-error';
+
+export class NotFoundError extends AppError {}
+~~~
+
+We write and if statement that checks the status of the error and we retrun an observable that has an error and the type of error is NotFoundError.
+
+~~~
+post.service.ts
+
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+
+
+  deletePost(post) {
+    return this.http.delete(this.url + '/' + post.id)
+      .catch((error: Response) => {
+        if (error.status === 404) {
+          return Observable.throw(new NotFoundError());
+        } else {
+          return Observable.throw(new AppError(error));
+        }
+      });
+  }
+}
+
+~~~
+
+The type of the error is changed to AppError and we check if the error is an 'instance" of NotFoundError
+~~~
+post.component.ts
+
+
+  deletePost(post) {
+    this.service.deletePost(234)
+      .subscribe(
+        response => {
+          const index = this.posts.indexOf(post);
+          this.posts.splice(index, 1);
+        },
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
+            alert('Post already deleted');
+          } else {
+            alert('An unexpeted error occured!!!!');
+          }
+        });
+    }
+~~~
+To handle bad request errors we follow the same suit.
+It is also worth noting that Observables a bunch of methods that we call operators such as catch which we needed to expliclty had to import. Same has to be done with the throw method.
+
+~~~
+post.service.ts
+
+
+import 'rxjs/add/observable/throw';
+~~~
+
+~~~
+bad-inpout-error.ts
+
+import { AppError } from './app-error';
+
+export class BadInput extends AppError {}
+~~~
+
+~~~
+createPost(post) {
+    return this.http.post(this.url, JSON.stringify(post))
+      .catch((error: Response) => {
+        if (error.status === 400) {
+          return Observable.throw(new BadInput(error.json()));
+        } else {
+          return Observable.throw(new AppError(error.json()));
+        }
+      });
+  }
+~~~
+
+~~~
+post.component.ts
+
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import { NotFoundError } from '../common/not-found-error';
+import { BadInput } from '../common/bad-input-error';
+
+
+
+createPost(input: HTMLInputElement) {
+    const post = { title: input.value };
+    input.value = '';
+    this.service.createPost(post)
+    .subscribe(
+      response => {
+        post['id'] = response.json().id;
+        this.posts.splice(0, 0, post);
+      },
+      (error: AppError) => {
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError; <-as we dont have a form
+        } else {
+          alert('An unexpeted error occured!!!!');
+        console.log(error + 'something bad happend');
+        }
+      });
+    }
+~~~
+
+
+###Global Error handling
+
+Looking at the methods inside the post.component.ts we see that either 
+
+~~~
+else {
+	alert('An unexpeted error occured!!!!');
+    console.log(error + 'something bad happend');
+  }
+~~~
+
+or 
+~~~
+,
+ error => {
+      alert('An unexpeted error occured!!!!');
+      console.log(error);
+});
+
+~~~
+
+is repeated in multiple places. In order to keep the code clean and refactor this, we create a global error handler.
+
+Firstly we create a file "app-error-handler.ts inside the common folder.
+
+We export a class that is responible for handling all the global errors in our application. We have a inbuilt class "ErrorHandler" which we can use.
+We then move the instructions for our errors.
+
+~~~
+import { ErrorHandler } from '@angular/core';
+
+export class AppErrorHandler implements ErrorHandler {
+    handleError(error) {
+        alert('An unexpected error occured!!!!');
+        console.log(error );
+    }
+}
+~~~
+
+Next we want to decakre it as a dependency in our app.module.ts. As we register it into the providers array we want to make sure that whereever we use ErrorHandler internally, we replace it with the new AppErrorHandler class.
+
+~~~
+],
+  providers: [
+    PostService,
+    AuthorsServices,
+    { provide: ErrorHandler, useClass: AppErrorHandler }
+  ],
+~~~
+
+Then inside our post.component.ts we clean out our code.
+
+~~~
+  ngOnInit() {
+  this.service.getPosts()
+      .subscribe(
+        response => {
+        // console.log(response.json());
+        this.posts = response.json();
+        },
+        error => {
+          alert('An unexpeted error occured!!!!');
+          console.log(error );
+        });
+    }
+
+  createPost(input: HTMLInputElement) {
+    const post = { title: input.value };
+    input.value = '';
+    this.service.createPost(post)
+    .subscribe(
+      response => {
+        post['id'] = response.json().id;
+        this.posts.splice(0, 0, post);
+      },
+      (error: AppError) => {
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError;
+        } else {
+          alert('An unexpeted error occured!!!!');
+        console.log(error + 'something bad happend');
+        }
+      });
+    }
+
+  updatePost(post) {
+    this.service.updatePost(post)
+    .subscribe(
+      response => {
+        console.log(response.json());
+      },
+      error => {
+        alert('An unexpeted error occured!!!!');
+        console.log(error);
+      });
+  }
+  deletePost(post) {
+    this.service.deletePost(234)
+      .subscribe(
+        response => {
+          const index = this.posts.indexOf(post);
+          this.posts.splice(index, 1);
+        },
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
+            alert('Post already deleted');
+          } else {
+            alert('An unexpeted error occured!!!!');
+          }
+        });
+    }
+}
+~~~
+
+to this 
+
+~~~
+ngOnInit() {
+  this.service.getPosts()
+      .subscribe(
+        response => {
+        // console.log(response.json());
+        this.posts = response.json();
+        });
+    }
+
+  createPost(input: HTMLInputElement) {
+    const post = { title: input.value };
+    input.value = '';
+    this.service.createPost(post)
+    .subscribe(
+      response => {
+        post['id'] = response.json().id;
+        this.posts.splice(0, 0, post);
+      },
+      (error: AppError) => {
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError;
+        } else {
+          throw error; // if we dont rethrow our error in the if statement itll never hit the global error handler
+        }
+      });
+    }
+
+  updatePost(post) {
+    this.service.updatePost(post)
+    .subscribe(
+      response => {
+        console.log(response.json());
+      });
+  }
+  deletePost(post) {
+    this.service.deletePost(234)
+      .subscribe(
+        response => {
+          const index = this.posts.indexOf(post);
+          this.posts.splice(index, 1);
+        },
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
+            alert('Post already deleted');
+          } else {
+            throw error;
+          }
+        });
+    }
+}
+~~~
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
