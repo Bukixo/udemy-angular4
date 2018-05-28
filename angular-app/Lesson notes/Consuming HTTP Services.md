@@ -120,9 +120,9 @@ export class PostsComponent {
 }
 ~~~~
 
-###Updating 
+##Update Request - updating data
 
-To implment the abilityto update data we add a button that handles a click event. We bind to upDATEpost method in our component then as the aguemtn is send the post object.
+To implment the ability to update data, we add a button that handles a click event. We bind to the update post method in our component then the arguement is sent to the post object.
 
 ~~~
 
@@ -141,8 +141,8 @@ To implment the abilityto update data we add a button that handles a click event
 </ul>
 ~~~
 
-In out component I will add the updaePost method.
-The difference between the patch and put menthod is that we use the patch method to update only a few porpteries in a object. So rather than sending the complete object to the server we only send theporperties that should be modified.
+In out component we add the updatePost method.
+The difference between the patch and put menthod is that we use the patch method to update only a few properties in an object. So rather than sending the complete object to the server we only send the properties that should be modified.
 
 Patch: 
 
@@ -152,9 +152,9 @@ this.http.patch(this.url, JSON.stringify({isRead: true}))
 
 Put:
 
-~~~
+``` javascript
 this.http.patch(this.url, JSON.stringify({post}))
-~~~
+```
 
 When using the patch/put it's important to reference a specific post by appending an id to the post.
 
@@ -169,7 +169,7 @@ When using the patch/put it's important to reference a specific post by appendin
 
 ~~~
 
-### DELETING DATA
+## DELETING DATA
 
 ~~~
 deletePost(post) {
@@ -181,17 +181,16 @@ deletePost(post) {
 }
 ~~~
 
-####OnInit Interface
+##OnInit Interface
 Initially we call the the http requests to access the posts inside the constructor, however as a good practice, constructors should be very lightweight and not perform expensive operations.
 
-During lifecycle hooks of a component which are -
+Lifecycle hooks of a component are -
 
 * Creating a component
 * Rendering it
 * Creating and rendering its children
 
-Angular calls for specific methods durong a lifecycle. One of them being 'ngOnInit'.
-
+Angular calls for specific methods during a lifecycle. One of them being 'ngOnInit'.
 
 ~~~
 export class PostsComponent implements OnInit {
@@ -209,24 +208,25 @@ export class PostsComponent implements OnInit {
   } 
 ~~~
 
-Do not call http requests inside the constructors of your component. To initalise use the ng oninit method.
+We do not call http requests inside the constructors of your component. To initalise use the **ng oninit** method.
 
-###Seperation of concerns and Creating Services
+##Seperation of concerns and Creating Services
 
 Classes should only be responsible for only one thing or else it violates the princple of 'seperation of concern' which makes componenets harder to maintain and test. 
  
-For instance when looking at the CRUD action, we may have the post method in several pages, thetfore if we needed to make a change on the url, we would have to make the change across several different places.
+For instance when looking at the CRUD action, we may have the post method in several pages, therefore if we needed to make a change on the url, we would have to make the change across several different places.
 
-A solution to this would be creating a service which would be pruely responsible for dealing with the backend. All the details working with gthe backend will be encasuplated in one space which makes it easier to update.
+A solution to this would be creating a service which would be purely responsible for dealing with the backend. All the details working with the backend will be encasuplated in one space which makes it easier to update.
 
-###Creating Services
+##Creating Services
 
 We firstly create a service component 
+
 ~~~
 ng g s post
 ~~~
 
-Inside the app.module we add PostService inside the providers array and also specific where the services are imported from.
+Inside the **app.module** we add PostService inside the providers array and also specific where the services are imported from.
  
 ~~~
 import { PostService } from './services/post.service';
@@ -239,8 +239,8 @@ import { PostService } from './services/post.service';
   ],
 ~~~
 
-Secondly, we create a Services folder and put all the services inside.
-We then go to the posts.components and the first thing we move is the url, which is the implementation detail about working with our backend
+Secondly, we create a Services folder and put all the service files inside.
+We then go to the **post.component.ts** and the first thing we move is the url, which is the implementation detail for our backend.
 
 ~~~
 ./posts.component.ts
@@ -256,7 +256,7 @@ export class PostsComponent implements OnInit {
   constructor(private service: PostService) {}
 ~~~
 
-Once the url has been moved, we then inject the private http class which is also imported from the top 
+Once the url has been moved, we then inject the private http class which is also imported at the top .
 
 ~~~
 /services/post.services.ts
@@ -271,7 +271,7 @@ export class PostService {
   constructor(private http: Http) { }
 ~~~
 
-In our post.component.ts in teh contrustcor we replace the private http parameter with our service. So we shouldn't inject our http class in our components as its a different concern, we let the services take care of it.
+In our **post.component.ts**, in the constructor, we replace the private http parameter with our service. So we shouldn't inject our http class in our components as its a different concern, we let the services take care of it.
 
 ~~~
 import { PostService } from './../services/post.service';
@@ -292,8 +292,8 @@ export class PostsComponent implements OnInit {
   ////
 ~~~
 
-#####get Service
-To modify the ngOnInit() method, the first line where we call the get moethod of th http class, will be removed and insteasd we creat a new method in our services class which calls the get method.
+##get Service
+To modify the ngOnInit() method, the first line where we call the get method of the http class, will be removed and instead we create a new method in our services class which calls the get method.
 
 ~~~
 // from this 
@@ -315,7 +315,7 @@ ngOnInit() {
   }
 ~~~
 
-Inside the post.component.ts 'http.get(this.url)' is replaced by 'service.getPosts()' and inside our post.services.ts we create a getPosts() which calls out the get method.
+Inside the **post.component.ts**, 'http.get(this.url)' is replaced by 'service.getPosts()' and inside our **post.services.ts** we create a **getPosts()** which calls out the get method.
 
 ~~~
 @Injectable()
@@ -329,9 +329,9 @@ export class PostService {
   }
 
 ~~~
-#####create Service
+##create Service
 
-Inside post.component.ts
+Inside **post.component.ts**:
 
 ~~~
 //from this 
@@ -345,7 +345,6 @@ createPost(input: HTMLInputElement) {
       .subscribe(response => {
         post.id = response.json().id;
         this.posts.splice(0, 0, post);
-        console.log(response.json());
       });
   }
  
@@ -356,7 +355,7 @@ createPost(input: HTMLInputElement) {
     const post = { title: input.value };
     input.value = '';
     
-    this.service.createPost(post)
+    this.service.createPost(post) //replaced the http with the service
     .subscribe(response => {
       post['id'] = response.json().id;
       this.posts.splice(0, 0, post);
@@ -374,7 +373,7 @@ Inside post.service.ts
   //
 ~~~ 
 
-#####update Service
+##update Service
 
 Inside post.component.ts
 
@@ -408,7 +407,7 @@ Inside post.service.ts
   }
   //
 ~~~ 
-#####delete Service
+##delete Service
 
 Inside post.component.ts
 
@@ -447,24 +446,24 @@ deletePosts(id) {
 
 ~~~ 
 
-###Handling Errors
+##Handling Errors
 
 When dealing with errors we have two main types of errors
 
-Unexpected error
+### Unexpected error
 
 - Server is offline - client sends request to the server but server is not running to recieve the request
 - Network is down - server is online but client cannot reach it ie faulty url
 - Unhandled exceptions - Due to bugs
 
-Expected errors
+### Expected errors
  
 - "Not found" error (404) - performing a crud action with an object that no longer exists
 - "Bad request" errors (400) - If theres a problem with the data that a user is trying to send to the server, the server will respond with a bad reuqest
 
-####Handling Unexpected errors
+##Handling Unexpected errors
 
-To change our implemnation to handle unexpected error we add another optional paramter in our subscribe method - error 
+To change our implementation to handle unexpected errors we add another optional parameter in our subscribe method - **error** 
 
 ~~~
 
@@ -485,7 +484,7 @@ To change our implemnation to handle unexpected error we add another optional pa
 
 The exact same code is applied on all the crud methods.
 
-#### Handling expected errors
+## Handling Expected errors
  
 When dealing with expected errors, we know for example, that posts with a given id does not exist in the server, which should throw a 404 error to the user.
 
@@ -510,9 +509,9 @@ deletePost(post) {
     }
 ~~~
 
-Now to handle 400 error due to bad data, we annote the error handler with a reaponse class and then cehck the status on the response.
+Now to handle 400 error due to bad data, we annote the error handler with a reaponse class and then check the status on the response.
 
-Instead of an alert we pretend we are working on a form and as want to dsiaply the error next to input fields.  
+Instead of an alert we pretend we are working on a form and as want to display the error next to input fields.  
 
 ~~~
 createPost(input: HTMLInputElement) {
@@ -535,11 +534,11 @@ createPost(input: HTMLInputElement) {
     }
 ~~~
 
-The line won't compile as don't have a form.
+>The line won't compile as we don't have a form.
 
-###Throwing Application specific errors
+##Throwing Application specific errors
 
-An Issue that comes with this implmentation is that it violates the seperation of concern. As we are working with the repsonse object which comes from the server it should be moved inside our service.
+An Issue that comes with this implementation is that it violates the seperation of concern. As we are working with the repsonse object which comes from the server it should be moved inside our service.
 
 ~~~
 ////
@@ -589,9 +588,9 @@ export class AppError {
 }
 ~~~
 
-Now we can apss our AppError object. We include the original error because somewhere we are going to get that error and log it into our server.
+Now we can pass our AppError object. We include the original error because somewhere we are going to get that error and log it into our server.
 
-Ctahcing an error object which is an instance of an Response class and then we are returning and different kind of error thats specific to our application.
+Catching an error object which is an instance of an Response class and then we are returning and different kind of error thats specific to our application.
 
 ~~~
 post.service.ts
@@ -940,6 +939,8 @@ private handleError(error: Response) {
 Inside our crud methods, we pass in a refernce to our new handleError function.
 
 ~~~
+data.service.ts 
+
 //
   getPosts() {
     return this.http.get(this.url)
@@ -956,19 +957,19 @@ Inside our crud methods, we pass in a refernce to our new handleError function.
       .catch(this.handleError);
   }
   //
-  deletePost(post) {
-    return this.http.delete(this.url + '/' + post.id)
+  deletePost(id) {
+    return this.http.delete(this.url + '/' + id)
       .catch(this.handleError);
   }
 ~~~
 
-### Extracting Resubale Data Services
+## Extracting Resubale Data Services
 
-In a real world aplpication we may be working with several services. All of which would have an identical layout. To avoid ourselves from repeateing code we will extract a resuable service that will handle the the crud actions, http requests and error.
+In a real world applications we may be working with several services. All of which would have an identical layout. To avoid ourselves from repeateing code we will extract a resuable service that will handle the the crud actions, http requests and error handling.
 
-We firstly create a new file called data.service.ts and copy all the code from our post.service.ts. Then we rename rename the class "PostService" to "DataService". Then we rename our methods so that they become generic and not attached to any of the post methods and the parameters will be replaced from "post" to "resource".
+We firstly create a new file called **data.service.ts** and copy all the code from our **post.service.ts**. Then we ename the class "PostService" to "DataService".
 
-Our constructor requires a http object.
+Following that, we rename our methods so that they become generic and not attached to any of the post methods and the parameters will be replaced from "post" to "resource".
 
 ~~~
 data.service.ts
@@ -1002,8 +1003,8 @@ export class DataService {
       .catch(this.handleError);
   }
   //
-  delete(resource) {
-    return this.http.delete(this.url + '/' + resource.id)
+  delete(id) {
+    return this.http.delete(this.url + '/' + id)
       .catch(this.handleError);
   }
 
@@ -1020,7 +1021,7 @@ export class DataService {
 }
 ~~~
 
-In the post.service, we delete all the methods because we have already defined them in the data service. Then we want our code to inherhent all the classes that we have defined in our data.service.ts. So we use the inherentence - "extends". Inside the constructor we use the super key workd to pass the http object and then we supply the url. Lastly we clean up the imports.
+In the post.service, we delete all the methods because we have already defined them in the data service. Then we want our code to inherhent all the classes that we have defined in our data.service.ts. So we use the inheritance syntax - "extends". Inside the constructor we use the super key-word to pass the http object and then we supply the url. Lastly we clean up the imports.
 
 ~~~
 import { DataService } from './data.service';
@@ -1059,9 +1060,9 @@ ngOnInit() {
       /////
 ~~~
 
-###Map Operators
+##Map Operators
 
-One last issue we still have is the fact that we are still working with "responses" inside the post.component. 
+One last issue we still have is the fact that we are still working with **responses** inside the post.component. 
 
 ~~~
 .subscribe(
@@ -1070,12 +1071,13 @@ One last issue we still have is the fact that we are still working with "respons
 	});
 ~~~
 
-This is something that needs to be moved into our services with the help of the ".map" operator.
+This is something that needs to be moved into our services with the help of the **.map** operator.
 
-Inside our dataService.service.ts, we use the obserable operators - map to tranform items inside an observable.
+Inside our **dataService.service.ts**, we use the obserable operators - map, to tranform items inside an observable.
 
-First we import the operator as they are not availble by default as it'll increase the size of our application.
-The we call out the map moethod - we are mapping/ transforming this repsonse to an array of js objects.
+First we import the operator as they are not availble by default (unused operators will increase the size of our application).
+
+The we call out the map method - we are mapping/ transforming this repsonse to an array of js objects.
 
 ~~~
 ///
@@ -1146,7 +1148,7 @@ export class DataService {
 
 ~~~
 
-and make the change accordingly on the post.component.ts
+and make the change accordingly in the **post.component.ts**.
 
 ~~~
 ///
@@ -1195,7 +1197,7 @@ createPost(input: HTMLInputElement) {
 
 ###Optimistic vs pesssmistic updates
 
-With Pessimistic updates, as theres a short delay when there's a response to the server we are - "hopeless" as we only rely on a response if everything if we get a succesful reponse. With the optimistic approach however, instead of waiting to get a repsonse from the server, we udpate the user interface immediately we expect that the call to the server is going to succeed and if it fails for some reason we just rollback the change. This optimitics method gives the appearance of a much faster working application.
+With Pessimistic updates, as theres a short delay when there's a response to the server we are - "hopeless" as we only rely on a response if everything if we get a succesful reponse. With the optimistic approach however, instead of waiting to get a repsonse from the server, we udpate the user interface immediately we expect that the call to the server is going to succeed and if it fails for some reason we just rollback the change. This optimstic method gives the appearance of a much faster working application.
 
 To create a optimistic update on our create flow, we firstly create a new object immediately and if we encounter any errors we just add a rollback function
 
@@ -1205,18 +1207,18 @@ post.component.ts
 
 createPost(input: HTMLInputElement) {
     const post = { title: input.value };
-    this.posts.splice(0, 0, post); // as soon as we create the post object we immedialtly update the post array
+    this.posts.splice(0, 0, post); // as soon as we create the post object we immediately update the post array
 
     input.value = ''; // then we clear our input
     //
-    this.service.create(post) // and make a call to the server. If
+    this.service.create(post) // and make a call to the server.
 
     .subscribe(
       newPost => {
         post['id'] = newPost.id; // if the server repsonds with a ok we set the post with a new id
       },
       (error: AppError) => {
-        this.posts.splice(0, 1); // otherwise if somethign goes wrong we want to rollback our change and remove the new post.
+        this.posts.splice(0, 1); // otherwise if something goes wrong we want to rollback our change and remove the new post.
         if (error instanceof BadInput) {
           // this.form.setErrors(error.originalError;
         } else {
@@ -1264,9 +1266,9 @@ And the same is done in the delete method.
 And fake en error in the service
 
 ~~~
- delete(resource) {
+ delete(id) {
     // return Observable.throw(new AppError());
-    return this.http.delete(this.url + '/' + resource.id)
+    return this.http.delete(this.url + '/' + id)
         .map(response => response.json())
         .catch(this.handleError);
   }

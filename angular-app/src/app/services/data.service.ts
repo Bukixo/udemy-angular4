@@ -17,6 +17,7 @@ export class DataService {
     .map(response => response.json())
     .catch(this.handleError);
   }
+
   //
   create(resource) {
       // return Observable.throw(new AppError());
@@ -31,9 +32,9 @@ export class DataService {
         .catch(this.handleError);
   }
   //
-  delete(resource) {
+  delete(id) {
     // return Observable.throw(new AppError());
-    return this.http.delete(this.url + '/' + resource.id)
+    return this.http.delete(this.url + '/' + id)
         .map(response => response.json())
         .catch(this.handleError);
   }
