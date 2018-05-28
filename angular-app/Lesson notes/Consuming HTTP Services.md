@@ -1,8 +1,9 @@
-## Consuming HTTP Services
-
+Consuming HTTP Services
+=
 ###JSONPlaceholder
 
-###Get requests - Getting data 
+##Get requests - Getting data 
+
 
 Firstly, to consume http services we go to **app.module.ts** and import the http module.
 
@@ -52,9 +53,9 @@ export class PostsComponent {
   }}
 ~~~
 
-The Subscribe function just like the Promise, to work with ansyrnchious or non blocking operations. Due to the delay of getting data, to avoid the thread of getting blocked we use the Subscribe to notify when it's ready.
+The Subscribe function, just like the Promise, is used to work with asynchronous or non blocking operations. To avoid the thread of getting blocked we use the Subscribe to notify when it's ready.
 
-Inside the posts.component.html we display the data in our view.
+Inside the **post.component.html** we display the data in our view.
 
 ~~~
 <ul class="list-group">
@@ -66,9 +67,9 @@ Inside the posts.component.html we display the data in our view.
 </ul>
 ~~~
 
-###Put Request - Creating data
+##Put Request - Creating data
 
-To add the ability to create a new post we firstly create an input field and assign a method with a reference as an argument (title).
+To add the ability to create a new post, we firstly create an input field and assign a method with a reference as an argument (title).
 
 ~~~
 <input
@@ -900,21 +901,379 @@ ngOnInit() {
 }
 ~~~
 
+### A resuable Error handling method
+
+In our  poat.service.ts code we see that the 
+
+~~~
+if (error.status === 404) {
+      return Observable.throw(new NotFoundError());
+    } else {
+      return Observable.throw(new AppError(error));
+    }
+~~~
+ and 
+~~~
+if (error.status === 400) {
+      return Observable.throw(new BadInput(error.json()));
+~~~
+Is heavily repeated.
+
+A way to refactor this, is by extracting a seperate private method called handleError where we can delegate the the error into that new method.
+
+The reason why we define it as private is because this is purely the implemntation detail of this post.service. We dont want the consumers of this service to know about this method. The post compment should not call this person from the outside. it only has access to the delete, update, create and get.
+
+~~~
+private handleError(error: Response) {
+    if (error.status === 400) {
+      return Observable.throw(new BadInput(error.json()));
+    }
+    if (error.status === 404) {
+      return Observable.throw(new NotFoundError());
+    } else {
+      return Observable.throw(new AppError(error));
+    }
+  }
+}
+~~~
+
+Inside our crud methods, we pass in a refernce to our new handleError function.
+
+~~~
+//
+  getPosts() {
+    return this.http.get(this.url)
+    .catch(this.handleError);
+  }
+  //
+  createPost(post) {
+    return this.http.post(this.url, JSON.stringify(post))
+    .catch(this.handleError);
+  }
+  //
+  updatePost(post) {
+    return this.http.patch(this.url + '/' + post.id, JSON.stringify({isRead: true}))
+      .catch(this.handleError);
+  }
+  //
+  deletePost(post) {
+    return this.http.delete(this.url + '/' + post.id)
+      .catch(this.handleError);
+  }
+~~~
+
+### Extracting Resubale Data Services
+
+In a real world aplpication we may be working with several services. All of which would have an identical layout. To avoid ourselves from repeateing code we will extract a resuable service that will handle the the crud actions, http requests and error.
+
+We firstly create a new file called data.service.ts and copy all the code from our post.service.ts. Then we rename rename the class "PostService" to "DataService". Then we rename our methods so that they become generic and not attached to any of the post methods and the parameters will be replaced from "post" to "resource".
+
+Our constructor requires a http object.
+
+~~~
+data.service.ts
 
 
+import { AppError } from './../common/app-error';
+import { Http } from '@angular/http';
+import { Injectable } from '@angular/core';
+import { Observable } from 'rxjs/Observable';
+import 'rxjs/add/operator/catch';
+import { NotFoundError } from '../common/not-found-error';
+import { BadInput } from '../common/bad-input-error';
+import 'rxjs/add/observable/throw';
+
+@Injectable()
+export class DataService {
+  constructor(private url: string, private http: Http) { }
+  //
+  getAll() {
+    return this.http.get(this.url)
+    .catch(this.handleError);
+  }
+  //
+  create(resource) {
+    return this.http.post(this.url, JSON.stringify(resource))
+    .catch(this.handleError);
+  }
+  //
+  update(resource) {
+    return this.http.patch(this.url + '/' + resource.id, JSON.stringify({isRead: true}))
+      .catch(this.handleError);
+  }
+  //
+  delete(resource) {
+    return this.http.delete(this.url + '/' + resource.id)
+      .catch(this.handleError);
+  }
+
+  private handleError(error: Response) {
+    if (error.status === 400) {
+      return Observable.throw(new BadInput(error.json()));
+    }
+    if (error.status === 404) {
+      return Observable.throw(new NotFoundError());
+    } else {
+      return Observable.throw(new AppError(error));
+    }
+  }
+}
+~~~
+
+In the post.service, we delete all the methods because we have already defined them in the data service. Then we want our code to inherhent all the classes that we have defined in our data.service.ts. So we use the inherentence - "extends". Inside the constructor we use the super key workd to pass the http object and then we supply the url. Lastly we clean up the imports.
+
+~~~
+import { DataService } from './data.service';
+import { Http } from '@angular/http';
+import { Injectable } from '@angular/core';
+
+@Injectable()
+export class PostService extends DataService {
+  constructor(http: Http) {
+    super('https://jsonplaceholder.typicode.com/posts', http);
+  }
+}
+~~~
+
+Finally, in our post.component, we rename the http methods in accordance to data.service.ts
+
+~~~
+ngOnInit() {
+//this.service.getPosts()
+  this.service.getAll()
+///     
+  createPost(input: HTMLInputElement) {
+    ////
+    //this.service.createPost(post)
+    this.service.create(post)
+    /////
+    
+  updatePost(post) {
+   	//this.service.updatePost(post)
+    this.service.update(post)
+    ////
+    
+   deletePost(post) {
+    //this.service.deletePost(444)
+    this.service.delete(444)
+      /////
+~~~
+
+###Map Operators
+
+One last issue we still have is the fact that we are still working with "responses" inside the post.component. 
+
+~~~
+.subscribe(
+	response => {
+	/////
+	});
+~~~
+
+This is something that needs to be moved into our services with the help of the ".map" operator.
+
+Inside our dataService.service.ts, we use the obserable operators - map to tranform items inside an observable.
+
+First we import the operator as they are not availble by default as it'll increase the size of our application.
+The we call out the map moethod - we are mapping/ transforming this repsonse to an array of js objects.
+
+~~~
+///
+import 'rxjs/add/operator/catch';
+import 'rxjs/add/operator/map';
+///
+
+getAll() {
+    return this.http.get(this.url)
+    .map(response => response.json())
+    .catch(this.handleError);
+  }
+~~~
+
+So back in our post.component, instead of getting back a response, we get an array of objects.
+
+~~~
+ngOnInit() {
+  this.service.getAll()
+      .subscribe(posts => this.posts = posts);
+    }
+~~~
+
+Back in our data.service.ts we modify all our responses using the map operator.
+
+~~~
+data.service.ts 
+
+@Injectable()
+export class DataService {
+  constructor(private url: string, private http: Http) { }
+  //
+  getAll() {
+    return this.http.get(this.url)
+    .map(response => response.json())
+    .catch(this.handleError);
+  }
+  //
+  create(resource) {
+    return this.http.post(this.url, JSON.stringify(resource))
+    .map(response => response.json())
+    .catch(this.handleError);
+  }
+  //
+  update(resource) {
+    return this.http.patch(this.url + '/' + resource.id, JSON.stringify({isRead: true}))
+        .map(response => response.json())
+        .catch(this.handleError);
+  }
+  //
+  delete(resource) {
+    return this.http.delete(this.url + '/' + resource.id)
+        .map(response => response.json())
+        .catch(this.handleError);
+  }
+
+  private handleError(error: Response) {
+    if (error.status === 400) {
+      return Observable.throw(new BadInput(error.json()));
+    }
+    if (error.status === 404) {
+      return Observable.throw(new NotFoundError());
+    } else {
+      return Observable.throw(new AppError(error));
+    }
+  }
+}
+
+~~~
+
+and make the change accordingly on the post.component.ts
+
+~~~
+///
+createPost(input: HTMLInputElement) {
+    const post = { title: input.value };
+    input.value = '';
+    this.service.create(post)
+    .subscribe(
+      newPost => {
+        post['id'] = newPost.id;
+        this.posts.splice(0, 0, post);
+      },
+      (error: AppError) => {
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError;
+        } else {
+          throw error;
+        }
+      });
+    }
+
+  updatePost(post) {
+    this.service.update(post)
+    .subscribe(
+      updatedPost => {
+        console.log(updatedPost);
+      });
+  }
+  deletePost(post) {
+    this.service.delete(444)
+      .subscribe(
+        () => {
+          const index = this.posts.indexOf(post);
+          this.posts.splice(index, 1);
+        },
+        (error: AppError) => {
+          if (error instanceof NotFoundError) {
+            alert('Post already deleted');
+          } else {
+            throw error;
+          }
+        });
+    }
+}
+~~~
+
+###Optimistic vs pesssmistic updates
+
+With Pessimistic updates, as theres a short delay when there's a response to the server we are - "hopeless" as we only rely on a response if everything if we get a succesful reponse. With the optimistic approach however, instead of waiting to get a repsonse from the server, we udpate the user interface immediately we expect that the call to the server is going to succeed and if it fails for some reason we just rollback the change. This optimitics method gives the appearance of a much faster working application.
+
+To create a optimistic update on our create flow, we firstly create a new object immediately and if we encounter any errors we just add a rollback function
+
+~~~
+post.component.ts 
 
 
+createPost(input: HTMLInputElement) {
+    const post = { title: input.value };
+    this.posts.splice(0, 0, post); // as soon as we create the post object we immedialtly update the post array
+
+    input.value = ''; // then we clear our input
+    //
+    this.service.create(post) // and make a call to the server. If
+
+    .subscribe(
+      newPost => {
+        post['id'] = newPost.id; // if the server repsonds with a ok we set the post with a new id
+      },
+      (error: AppError) => {
+        this.posts.splice(0, 1); // otherwise if somethign goes wrong we want to rollback our change and remove the new post.
+        if (error instanceof BadInput) {
+          // this.form.setErrors(error.originalError;
+        } else {
+          throw error;
+        }
+      });
+    }
+~~~
+
+In the data.service.ts we similate a scenario where a call to the server fails by returning an error. Throw is a factory operator that creates
+~~~
+data.service.ts
 
 
+ create(resource) {
+       return Observable.throw(new AppError());
+      // an obseravble object which contains an error.
+    // return this.http.post(this.url, JSON.stringify(resource))
+    // .map(response => response.json())
+    // .catch(this.handleError);
+  }
+~~~
 
+And the same is done in the delete method.
 
+~~~
+  deletePost(post) {
+    const index = this.posts.indexOf(post); // we delete the post straight away
+    this.posts.splice(index, 1);
 
+    this.service.delete(post.id) /// then we call the service
+      .subscribe(
+        null,
+        (error: AppError) => {
+          this.posts.splice(index, 0, post); // however if an error occurs we want to rollback our change and readd our change
+          if (error instanceof NotFoundError) {
+            alert('Post already deleted');
+          } else {
+            throw error;
+          }
+        });
+    }
+~~~
 
+And fake en error in the service
 
+~~~
+ delete(resource) {
+    // return Observable.throw(new AppError());
+    return this.http.delete(this.url + '/' + resource.id)
+        .map(response => response.json())
+        .catch(this.handleError);
+  }
 
-
-
-
+  private handleError(error: Response) {
+  /////
+~~~
 
 
 

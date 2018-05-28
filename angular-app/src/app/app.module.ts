@@ -14,9 +14,6 @@ import { PostsComponent } from './posts/posts.component';
 import { AppErrorHandler } from './common/app-error-handler';
 
 
-
-
-
 @NgModule({
   declarations: [
     AppComponent,
